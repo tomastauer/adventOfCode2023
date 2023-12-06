@@ -87,3 +87,21 @@ export function makePairs<T>(array: T[]): [T, T][] {
 export function makeGrid(height: number, width: number): number[][] {
 	return new Array(height).fill(0).map(() => new Array(width).fill(0));
 }
+
+export function partitionBy<T>(
+	array: T[],
+	predicate: (item: T, index: number) => boolean,
+): [T[], T[]] {
+	const partitionOne: T[] = [];
+	const partitionTwo: T[] = [];
+
+	array.forEach((item, index) => {
+		if (predicate(item, index)) {
+			partitionOne.push(item);
+		} else {
+			partitionTwo.push(item);
+		}
+	});
+
+	return [partitionOne, partitionTwo];
+}
