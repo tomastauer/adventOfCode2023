@@ -1,0 +1,11 @@
+[ "VCA", "FRA", "SNA", "HNA", "AAA", "RPA" ]
+307
+[
+  { periodStartsAt: 2, periodEndsAt: 18115, endsWithZ: [ 18113 ] },
+  { periodStartsAt: 2, periodEndsAt: 22413, endsWithZ: [ 22411 ] },
+  { periodStartsAt: 3, periodEndsAt: 21800, endsWithZ: [ 21797 ] },
+  { periodStartsAt: 2, periodEndsAt: 14431, endsWithZ: [ 14429 ] },
+  { periodStartsAt: 3, periodEndsAt: 16274, endsWithZ: [ 16271 ] },
+  { periodStartsAt: 2, periodEndsAt: 18729, endsWithZ: [ 18727 ] }
+]
+[ 0, 0 ]
