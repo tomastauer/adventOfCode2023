@@ -5,17 +5,18 @@ export default class Day01 implements Solution {
 
 	solvePart1(input: string[]) {
 		const parsed = this.parse(input);
-		const rearranged = parsed.map(c => this.rearrange(c)).map(c => this.score(c));
-		
+		const rearranged = parsed.map((c) => this.rearrange(c)).map((c) =>
+			this.score(c)
+		);
+
 		return rearranged.reduce((agg, curr) => agg + curr);
 	}
 
 	solvePart2(input: string[]) {
 		let iterated = this.parse(input);
 
-		
-		while(true) {
-			if(this.memoized.has(this.serialize(iterated))) {
+		while (true) {
+			if (this.memoized.has(this.serialize(iterated))) {
 				break;
 			}
 			iterated = this.iterate(iterated);
@@ -27,19 +28,21 @@ export default class Day01 implements Solution {
 
 		console.log(keys.length, keys.indexOf(this.serialize(iterated)));
 
-		return this.deserialize(keys[(1000000000-i) % period + i]).map(c=>this.score(c)).reduce((agg, curr) => agg+curr);
+		return this.deserialize(keys[(1000000000 - i) % period + i]).map((c) =>
+			this.score(c)
+		).reduce((agg, curr) => agg + curr);
 	}
 
 	iterate(columns: string[]) {
 		const memoized = this.memoized.get(this.serialize(columns));
-		if(memoized) {
+		if (memoized) {
 			return this.deserialize(memoized);
 		}
 
-		const l0 = columns.map(c => this.rearrange(c));
-		const l90 = this.rotate(l0).map(c => this.rearrange(c));
-		const l180 = this.rotate(l90).map(c => this.rearrange(c));
-		const l270 = this.rotate(l180).map(c => this.rearrange(c));
+		const l0 = columns.map((c) => this.rearrange(c));
+		const l90 = this.rotate(l0).map((c) => this.rearrange(c));
+		const l180 = this.rotate(l90).map((c) => this.rearrange(c));
+		const l270 = this.rotate(l180).map((c) => this.rearrange(c));
 		const result = this.rotate(l270);
 
 		this.memoized.set(this.serialize(columns), this.serialize(result));
@@ -50,7 +53,7 @@ export default class Day01 implements Solution {
 	rearrange(column: string) {
 		return column.split('#').map((c) => {
 			const l = c.length;
-			const o = c.split('').filter(d => d === 'O').length;
+			const o = c.split('').filter((d) => d === 'O').length;
 			return 'O'.repeat(o).padEnd(l, '.');
 		}).join('#');
 	}
@@ -61,16 +64,18 @@ export default class Day01 implements Solution {
 
 	score(column: string) {
 		return column.split('').reduce((agg, curr, i) => {
-			if(curr === 'O') {
+			if (curr === 'O') {
 				agg += column.length - i;
 			}
 
 			return agg;
-		}, 0)
+		}, 0);
 	}
 
 	parse(input: string[]) {
-		return new Array(input[0].length).fill(0).map((_, i) => input.map(r => r[i]).join(''));
+		return new Array(input[0].length).fill(0).map((_, i) =>
+			input.map((r) => r[i]).join('')
+		);
 	}
 
 	serialize(columns: string[]) {
