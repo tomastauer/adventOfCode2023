@@ -29,7 +29,101 @@ export default class Day01 implements Solution {
 	}
 
 	solvePart2(input: string[]) {
-		return 0;
+		const grid = addBorder(input.map((i) => i.split('')), '.', 1);
+		const start = this.findStart(grid);
+		let next = this.findStartDirection(grid, start);
+
+		const path = [next];
+		while (grid[next.y][next.x] !== 'S') {
+			next = this.walk(grid, next.dir, next);
+			path.push(next);
+		}
+
+		let xx = false;
+		let yy = false;
+
+		for(let y = 0; y < grid.length; y++) {
+			xx = false;
+			let lopen = false;
+			let fopen = false;
+			for(let x = 0; x < grid[y].length; x++) {
+				if(xx && !path.find(p => p.x === x && p.y === y)) {
+					grid[y][x] = 'x';
+				}
+
+				if(path.find(p => p.x === x && p.y === y)) {
+					switch(grid[y][x]) {
+						case '|':
+							xx = !xx;
+							break;
+						case 'L':
+							lopen = true;
+							break;
+						case 'F':
+							fopen = true;
+							break;
+						case 'J':
+							if(fopen) {
+								xx = !xx;
+							}
+							lopen = false;
+							fopen = false;
+							break;
+						case '7':
+							if(lopen) {
+								xx = !xx;
+							}
+							lopen = false;
+							fopen = false;
+							break;
+					}
+				}
+			}
+		}
+
+		let counter = 0;
+
+		for(let x = 0; x < grid[0].length; x++) {
+			yy = false;
+			let fopen = false;
+			let sopen = false;
+			for(let y = 0; y < grid.length; y++) {
+				if(yy && grid[y][x] === 'x') {
+					grid[y][x] = 'y';
+					counter++;
+				}
+
+				if(path.find(p => p.x === x && p.y === y)) {
+					switch(grid[y][x]) {
+						case '-':
+							yy = !yy;
+							break;
+						case '7':
+							sopen = true;
+							break;
+						case 'F':
+							fopen = true;
+							break;
+						case 'J':
+							if(fopen) {
+								yy = !yy;
+							}
+							sopen = false;
+							fopen = false;
+							break;
+						case 'L':
+							if(sopen) {
+								yy = !yy;
+							}
+							sopen = false;
+							fopen = false;
+							break;
+					}
+				}
+			}
+		}
+
+		return counter;
 	}
 
 	walk(

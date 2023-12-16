@@ -105,3 +105,14 @@ export function partitionBy<T>(
 
 	return [partitionOne, partitionTwo];
 }
+
+export function print(array: string[][]) {
+	for(let y = 0; y < array.length; y++) {
+		const line = [];
+		for(let x = 0; x < array[y].length; x++) {
+			line.push(array[y][x]);
+		}
+
+		console.log(line.join(''));
+	}
+}
