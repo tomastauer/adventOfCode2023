@@ -84,8 +84,10 @@ export function makePairs<T>(array: T[]): [T, T][] {
 	);
 }
 
-export function makeGrid(height: number, width: number): number[][] {
-	return new Array(height).fill(0).map(() => new Array(width).fill(0));
+export function makeGrid<T>(height: number, width: number, fill?: T): T[][] {
+	return new Array(height).fill(0).map(() =>
+		new Array(width).fill(fill ?? 0)
+	);
 }
 
 export function partitionBy<T>(
@@ -107,12 +109,16 @@ export function partitionBy<T>(
 }
 
 export function print(array: string[][]) {
-	for(let y = 0; y < array.length; y++) {
+	for (let y = 0; y < array.length; y++) {
 		const line = [];
-		for(let x = 0; x < array[y].length; x++) {
+		for (let x = 0; x < array[y].length; x++) {
 			line.push(array[y][x]);
 		}
 
 		console.log(line.join(''));
 	}
+}
+
+export function get4Adjacent(x: number, y: number) {
+	return [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }];
 }

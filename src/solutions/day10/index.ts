@@ -42,17 +42,17 @@ export default class Day01 implements Solution {
 		let xx = false;
 		let yy = false;
 
-		for(let y = 0; y < grid.length; y++) {
+		for (let y = 0; y < grid.length; y++) {
 			xx = false;
 			let lopen = false;
 			let fopen = false;
-			for(let x = 0; x < grid[y].length; x++) {
-				if(xx && !path.find(p => p.x === x && p.y === y)) {
+			for (let x = 0; x < grid[y].length; x++) {
+				if (xx && !path.find((p) => p.x === x && p.y === y)) {
 					grid[y][x] = 'x';
 				}
 
-				if(path.find(p => p.x === x && p.y === y)) {
-					switch(grid[y][x]) {
+				if (path.find((p) => p.x === x && p.y === y)) {
+					switch (grid[y][x]) {
 						case '|':
 							xx = !xx;
 							break;
@@ -63,14 +63,14 @@ export default class Day01 implements Solution {
 							fopen = true;
 							break;
 						case 'J':
-							if(fopen) {
+							if (fopen) {
 								xx = !xx;
 							}
 							lopen = false;
 							fopen = false;
 							break;
 						case '7':
-							if(lopen) {
+							if (lopen) {
 								xx = !xx;
 							}
 							lopen = false;
@@ -83,18 +83,18 @@ export default class Day01 implements Solution {
 
 		let counter = 0;
 
-		for(let x = 0; x < grid[0].length; x++) {
+		for (let x = 0; x < grid[0].length; x++) {
 			yy = false;
 			let fopen = false;
 			let sopen = false;
-			for(let y = 0; y < grid.length; y++) {
-				if(yy && grid[y][x] === 'x') {
+			for (let y = 0; y < grid.length; y++) {
+				if (yy && grid[y][x] === 'x') {
 					grid[y][x] = 'y';
 					counter++;
 				}
 
-				if(path.find(p => p.x === x && p.y === y)) {
-					switch(grid[y][x]) {
+				if (path.find((p) => p.x === x && p.y === y)) {
+					switch (grid[y][x]) {
 						case '-':
 							yy = !yy;
 							break;
@@ -105,14 +105,14 @@ export default class Day01 implements Solution {
 							fopen = true;
 							break;
 						case 'J':
-							if(fopen) {
+							if (fopen) {
 								yy = !yy;
 							}
 							sopen = false;
 							fopen = false;
 							break;
 						case 'L':
-							if(sopen) {
+							if (sopen) {
 								yy = !yy;
 							}
 							sopen = false;
