@@ -1,4 +1,5 @@
-import { addBorder } from '../../utilities/array.ts';
+import { get4AdjacentDirections } from '../../utilities/array.ts';
+import { PriorityQueue } from '../../utilities/priorityQueue.ts';
 import { Solution } from '../../utilities/solver.ts';
 
 type Position = {
@@ -6,13 +7,11 @@ type Position = {
 	y: number;
 };
 
-type Direction = 'r' | 'l' | 'b' | 't';
-
 type Distance = number;
 
 type Visit = {
 	position: Position;
-	direction: Direction;
+	direction: Position;
 	distance: Distance;
 };
 
@@ -29,242 +28,195 @@ type Visited = {
 
 type City = {
 	map: number[][];
-	visited: Map<string, number>;
-	visitedHash: Map<string, Visited>;
+	visitedHash: Set<string>;
 	min: number;
 };
 
 export default class Day01 implements Solution {
 	solvePart1(input: string[]) {
-		return 0;
 		const parsed = this.parse(input);
+		const queue = new PriorityQueue<NextVisit>();
 
-		const turns: NextVisit[] = [{
+		queue.push(0, {
 			heatLoss: 0,
-			visit: { direction: 'r', distance: 1, position: { x: 1, y: 1 } },
+			visit: {
+				direction: { x: 0, y: 0 },
+				distance: 0,
+				position: { x: 0, y: 0 },
+			},
 			path: [],
-		}];
+		});
 
-		let currentTurn = turns.shift();
-		while (currentTurn) {
-			turns.push(
-				...this.move(
-					parsed,
-					currentTurn.visit,
-					currentTurn.heatLoss,
-					currentTurn.path,
-				),
-			);
-			currentTurn = turns.pop();
+		while (queue.some()) {
+			const { visit, heatLoss } = queue.pop()!;
+			const { distance, direction, position } = visit;
+
+			if (
+				position.x === parsed.map[0].length - 1 &&
+				position.y === parsed.map.length - 1
+			) {
+				return heatLoss;
+			}
+
+			const key = this.serialize(visit);
+
+			if (parsed.visitedHash.has(key)) {
+				continue;
+			}
+
+			parsed.visitedHash.add(key);
+
+			if (distance < 3 && (direction.x !== 0 || direction.y !== 0)) {
+				const next = {
+					x: position.x + direction.x,
+					y: position.y + direction.y,
+				};
+				if (
+					next.x >= 0 && next.x < parsed.map[0].length &&
+					next.y >= 0 && next.y < parsed.map.length
+				) {
+					const totalLoss = heatLoss + parsed.map[next.y][next.x];
+					queue.push(totalLoss, {
+						heatLoss: totalLoss,
+						path: [],
+						visit: {
+							direction,
+							position: next,
+							distance: distance + 1,
+						},
+					});
+				}
+			}
+
+			get4AdjacentDirections().forEach(({ x, y }) => {
+				if (
+					(x === direction.x && y === direction.y) ||
+					(x === -direction.x && y === -direction.y)
+				) {
+					return;
+				}
+				const next = { x: position.x + x, y: position.y + y };
+
+				if (
+					next.x >= 0 && next.x < parsed.map[0].length &&
+					next.y >= 0 && next.y < parsed.map.length
+				) {
+					const totalLoss = heatLoss + parsed.map[next.y][next.x];
+					queue.push(totalLoss, {
+						heatLoss: totalLoss,
+						path: [],
+						visit: {
+							direction: { x, y },
+							position: next,
+							distance: 1,
+						},
+					});
+				}
+			});
 		}
 
-		return parsed.min - parsed.map[1][1];
+		return 0;
 	}
 
 	solvePart2(input: string[]) {
 		const parsed = this.parse(input);
+		const queue = new PriorityQueue<NextVisit>();
 
-		const turns: NextVisit[] = [{
+		queue.push(0, {
 			heatLoss: 0,
-			visit: { direction: 'r', distance: 0, position: { x: 1, y: 1 } },
+			visit: {
+				direction: { x: 0, y: 0 },
+				distance: 0,
+				position: { x: 0, y: 0 },
+			},
 			path: [],
-		}];
+		});
 
-		let currentTurn = turns.shift();
-		while (currentTurn) {
-			turns.push(
-				...this.move2(
-					parsed,
-					currentTurn.visit,
-					currentTurn.heatLoss,
-					currentTurn.path,
-				),
-			);
-			currentTurn = turns.pop();
-		}
+		while (queue.some()) {
+			const { visit, heatLoss } = queue.pop()!;
+			const { distance, direction, position } = visit;
 
-		const q = Array.from(parsed.visitedHash.entries()).filter(([k]) =>
-			k.startsWith(`${parsed.map.length - 2}|${parsed.map[0].length - 2}`)
-		);
-		q.sort(([, a], [, b]) => a.heatLoss - b.heatLoss);
-		// console.log(q[0]);
+			if (
+				position.x === parsed.map[0].length - 1 &&
+				position.y === parsed.map.length - 1 && distance >= 4
+			) {
+				return heatLoss;
+			}
 
-		return parsed.min - parsed.map[1][1];
-	}
+			const key = this.serialize(visit);
 
-	print(map: number[][], path: Position[]) {
-		for (let y = 0; y < map.length; y++) {
-			const line = [];
-			for (let x = 0; x < map[y].length; x++) {
-				if (path.some((p) => p.x === x && p.y === y)) {
-					line.push('X');
-				} else {
-					line.push(map[y][x]);
+			if (parsed.visitedHash.has(key)) {
+				continue;
+			}
+
+			parsed.visitedHash.add(key);
+
+			if (distance < 10 && (direction.x !== 0 || direction.y !== 0)) {
+				const next = {
+					x: position.x + direction.x,
+					y: position.y + direction.y,
+				};
+				if (
+					next.x >= 0 && next.x < parsed.map[0].length &&
+					next.y >= 0 && next.y < parsed.map.length
+				) {
+					const totalLoss = heatLoss + parsed.map[next.y][next.x];
+					queue.push(totalLoss, {
+						heatLoss: totalLoss,
+						path: [],
+						visit: {
+							direction,
+							position: next,
+							distance: distance + 1,
+						},
+					});
 				}
 			}
-			console.log(line.join(''));
+
+			if (distance >= 4 || (direction.x === 0 && direction.y === 0)) {
+				get4AdjacentDirections().forEach(({ x, y }) => {
+					if (
+						(x === direction.x && y === direction.y) ||
+						(x === -direction.x && y === -direction.y)
+					) {
+						return;
+					}
+					const next = { x: position.x + x, y: position.y + y };
+
+					if (
+						next.x >= 0 && next.x < parsed.map[0].length &&
+						next.y >= 0 && next.y < parsed.map.length
+					) {
+						const totalLoss = heatLoss + parsed.map[next.y][next.x];
+						queue.push(totalLoss, {
+							heatLoss: totalLoss,
+							path: [],
+							visit: {
+								direction: { x, y },
+								position: next,
+								distance: 1,
+							},
+						});
+					}
+				});
+			}
 		}
+
+		return 0;
 	}
 
 	parse(input: string[]): City {
-		const map = addBorder(
-			input.map((i) => i.split('').map((c) => parseInt(c))),
-			0,
-			1,
-		);
+		const map = input.map((i) => i.split('').map((c) => parseInt(c)));
 
 		return {
 			map,
-			visited: new Map<string, number>(),
-			visitedHash: new Map<string, Visited>(),
+			visitedHash: new Set<string>(),
 			min: Number.MAX_SAFE_INTEGER,
 		};
 	}
 
-	move(city: City, current: Visit, heatLoss: number, path: Position[]) {
-		const serialized = this.serialize(current);
-		const existingVisit = city.visitedHash.get(serialized);
-		const currentHeatLoss =
-			city.map[current.position.y][current.position.x];
-
-		const newHeatLoss = heatLoss + currentHeatLoss;
-
-		if (
-			current.position.y === city.map.length - 2 &&
-			current.position.x === city.map[0].length - 2
-		) {
-			if (newHeatLoss < city.min) {
-				city.min = newHeatLoss;
-			}
-		}
-
-		if (newHeatLoss >= city.min || currentHeatLoss === 0) {
-			return [];
-		}
-
-		if (existingVisit && existingVisit.heatLoss <= newHeatLoss) {
-			return [];
-		} else {
-			city.visitedHash.set(serialized, { path, heatLoss: newHeatLoss });
-		}
-
-		const nextVisits: NextVisit[] = [];
-		this.getTurns(current.direction).forEach((d) => {
-			nextVisits.push({
-				visit: {
-					direction: d,
-					distance: 1,
-					position: this.getNextPosition(current.position, d),
-				},
-				heatLoss: newHeatLoss,
-				path,
-			});
-		});
-
-		if (current.distance < 3) {
-			nextVisits.push({
-				visit: {
-					direction: current.direction,
-					distance: current.distance + 1 as Distance,
-					position: this.getNextPosition(
-						current.position,
-						current.direction,
-					),
-				},
-				heatLoss: newHeatLoss,
-				path,
-			});
-		}
-		return nextVisits;
-	}
-
-	move2(city: City, current: Visit, heatLoss: number, path: Position[]) {
-		const serialized = this.serialize(current);
-		const existingVisit = city.visitedHash.get(serialized);
-		const currentHeatLoss =
-			city.map[current.position.y][current.position.x];
-
-		const newHeatLoss = heatLoss + currentHeatLoss;
-
-		if (
-			current.position.y === city.map.length - 2 &&
-			current.position.x === city.map[0].length - 2
-		) {
-			if (newHeatLoss < city.min && current.distance >= 4) {
-				console.log(newHeatLoss);
-				city.min = newHeatLoss;
-			}
-		}
-
-		if (newHeatLoss >= city.min || currentHeatLoss === 0) {
-			return [];
-		}
-
-		if (existingVisit && existingVisit.heatLoss <= newHeatLoss) {
-			return [];
-		} else {
-			city.visitedHash.set(serialized, { path, heatLoss: newHeatLoss });
-		}
-
-		const newPath = path; //[...path, current.position]
-		const nextVisits: NextVisit[] = [];
-
-		if (current.distance >= 4) {
-			this.getTurns(current.direction).forEach((d) => {
-				nextVisits.push({
-					visit: {
-						direction: d,
-						distance: 1,
-						position: this.getNextPosition(current.position, d),
-					},
-					heatLoss: newHeatLoss,
-					path: newPath,
-				});
-			});
-		}
-
-		if (current.distance < 10) {
-			nextVisits.push({
-				visit: {
-					direction: current.direction,
-					distance: current.distance + 1,
-					position: this.getNextPosition(
-						current.position,
-						current.direction,
-					),
-				},
-				heatLoss: newHeatLoss,
-				path: newPath,
-			});
-		}
-		return nextVisits;
-	}
-
-	getTurns(direction: Direction): Direction[] {
-		switch (direction) {
-			case 'b':
-			case 't':
-				return ['l', 'r'];
-			case 'l':
-			case 'r':
-				return ['t', 'b'];
-		}
-	}
-
-	getNextPosition(current: Position, direction: Direction) {
-		switch (direction) {
-			case 'b':
-				return { x: current.x, y: current.y + 1 };
-			case 't':
-				return { x: current.x, y: current.y - 1 };
-			case 'l':
-				return { x: current.x - 1, y: current.y };
-			case 'r':
-				return { x: current.x + 1, y: current.y };
-		}
-	}
-
 	serialize({ position, direction, distance }: Visit) {
-		return [position.x, position.y, direction, distance].join('|');
+		return [position.x, position.y, direction.x, direction.y, distance]
+			.join('|');
 	}
 }

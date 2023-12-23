@@ -122,3 +122,7 @@ export function print(array: string[][]) {
 export function get4Adjacent(x: number, y: number) {
 	return [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }];
 }
+
+export function get4AdjacentDirections() {
+	return [{ x: -1, y: 0 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: 0, y: 1 }];
+}
