@@ -1,0 +1,15 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:nerdamer": "npm:nerdamer@1.1.13"
+    },
+    "npm": {
+      "nerdamer@1.1.13": {
+        "integrity": "sha512-kQGQYd42eQpKDOnU8ZnRKF47c+gK6jVC46eUchrABsovtFruHvsjyjBO32jck8QnpZE5z5R8HQw72hQX9Oq2MQ==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {}
+}
